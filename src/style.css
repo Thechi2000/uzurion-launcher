@@ -14,13 +14,38 @@
   -webkit-text-size-adjust: 100%;
 }
 
-.container {
+#app-menu {
   margin: 0;
-  padding-top: 10vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  height: 40%;
+  width: 100%;
+
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.vertical-container {
+  margin: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   text-align: center;
+
+  width: 20%;
+
+  background-color: #080808;
+}
+.vertical-container + .center{
+  width: 40%;
+}
+.vertical-container * {
+  margin: 10%;
+  background-color: #535bf2;
+  height: 35%;
 }
 
 .logo {
