@@ -1,9 +1,5 @@
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
-import Image from "next/image";
-import reactLogo from "../assets/react.svg";
-import tauriLogo from "../assets/tauri.svg";
-import nextLogo from "../assets/next.svg";
 import Settings from "./settings";
 import Accounts from "./accounts";
 import Socials from "./socials";
@@ -18,9 +14,13 @@ function App() {
     setGreetMsg(await invoke("greet", { name }));
   }
 
+  async function play() {
+    await invoke("play")
+  }
+
   return (
-    <div className="container">
-      <h1>Uzurion</h1>
+    <div id="app">
+      <h1 id="title">Uzurion</h1>
 
       <div id="app-menu">
         <div className="vertical-container">
@@ -28,7 +28,7 @@ function App() {
           <Settings/>
         </div>
         <div className="vertical-container center">
-          <button>Play</button>
+          <button id="#play" onClick={() => play()}>Play</button>
           <Socials/>
         </div>
         <div className="vertical-container">
