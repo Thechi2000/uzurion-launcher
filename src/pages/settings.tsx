@@ -1,4 +1,5 @@
-export default function Settings(){
+export default function Settings({visibility, setVisibility}){
+
     function parameters(){
         return (
             <div className="settings-parameters">
@@ -9,12 +10,13 @@ export default function Settings(){
     }
 
     return (
-        <div id="settings-canvas">
+        <div id="settings-canvas" style={{visibility: visibility ? "visible" : "hidden"}}>
             <div id="settings">
                 {parameters()}
                 <div id="settings-navigator">
                     <p>JVM</p>
                     <p>Launcher</p>
+                    <p onClick={() => setVisibility(false)}>Quit</p>
                 </div>
             </div>
         </div>

@@ -7,13 +7,7 @@ import Status from "./status";
 import Settings from "./settings";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  const [settingsVisibility, setSettingsVisibility] = useState(false);
 
   async function play() {
     await invoke("play")
@@ -27,7 +21,7 @@ function App() {
         <div id="app-menu">
           <div className="vertical-container left">
             <Accounts/>
-            <SettingsLogo/>
+            <SettingsLogo setSettingsVisibility={setSettingsVisibility}/>
           </div>
           <div className="vertical-container center">
             <button id="play" onClick={() => play()}>Play</button>
@@ -39,7 +33,7 @@ function App() {
         </div>
       </div>
 
-      <Settings/>
+      <Settings visibility={settingsVisibility} setVisibility={setSettingsVisibility}/>
     </div>
     );
 }
