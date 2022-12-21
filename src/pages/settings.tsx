@@ -1,10 +1,22 @@
-import Image from "next/image"
-import settingsLogo from "../assets/settings.svg"
-
 export default function Settings(){
+    function parameters(){
+        return (
+            <div className="settings-parameters">
+                <div><input placeholder="Java path"/></div>
+                <div><input placeholder="Java path"/></div>
+            </div>  
+        )
+    }
+
     return (
-        <div id="settings">
-            <Image id="settings-logo" src={settingsLogo} width={60} height={60}/>
+        <div id="settings-canvas">
+            <div id="settings">
+                {parameters()}
+                <div id="settings-navigator">
+                    <p>JVM</p>
+                    <p>Launcher</p>
+                </div>
+            </div>
         </div>
     )
 }

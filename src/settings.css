@@ -1,0 +1,63 @@
+#settings-canvas {
+    z-index: 5;
+    background-color: #222222BB;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.settings-parameters {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    margin: 7%;
+}
+.settings-parameters * {
+    margin-bottom: 3%;
+}
+
+#settings {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #222222EE;
+
+    width: 30%;
+    height: 60%;
+
+    border-radius: 20px;
+    border: #000088 solid;
+}
+
+#settings-navigator {
+    display: flex;
+    flex-direction: row;
+    padding-left: 7%;
+    padding-right: 7%;
+
+    align-self: flex-start;
+}
+
+#settings-navigator * {
+    margin: 10%;
+    color: beige;
+}
+
+#settings-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#settings-logo * {
+    filter: invert(100%) sepia(0%) saturate(371%) hue-rotate(146deg) brightness(112%) contrast(73%);
+    cursor: pointer;
+}
