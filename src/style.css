@@ -40,6 +40,12 @@
   left: 0;
 }
 
+.container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .vertical-container {
   margin: 0;
   display: flex;
@@ -69,23 +75,21 @@
 
 #status {
   color: beige;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: nowrap;
 }
 
 #status h2 {
   font-size: 24px;
 }
 
+#status * {
+  margin: 3%;
+}
+
 #status p{
   font-size: 16px;
-  line-height: 50%;
-}
-
-#status div Image {
-  width: 20px;
-}
-
-.container{
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  line-height: 30%;
 }

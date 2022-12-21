@@ -31,12 +31,10 @@ export default function Status() {
 
     function getOnlinePlayers(){
         if (status == "offline"){
-            return (
-                <p></p>
-            )
+            return null
         } else {
             return (
-                <p>4 players online</p>
+                <div><p>4 players</p></div>
             )
         }
     }
@@ -49,7 +47,7 @@ export default function Status() {
                 <svg viewBox="0 0 20 20" width="7%" height="7%"><circle id="Ellipse_8" cx="10" cy="10" r="10" fill={statusColor()} /></svg>
             </div>
             {getOnlinePlayers()}
-            <Image src={refreshLogo} onClick={() => switchStatus()} width="40%" height="40%"/>
+            <div><Image src={refreshLogo} onClick={() => switchStatus()} width="40%" height="40%"/></div>
         </div>
     )
 }
