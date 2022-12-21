@@ -28,7 +28,7 @@ function App() {
           <Settings/>
         </div>
         <div className="vertical-container center">
-          <button id="#play" onClick={() => play()}>Play</button>
+          <button id="play" onClick={() => play()}>Play</button>
           <Socials/>
         </div>
         <div className="vertical-container">

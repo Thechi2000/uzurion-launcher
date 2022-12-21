@@ -93,3 +93,18 @@
   font-size: 16px;
   line-height: 30%;
 }
+
+#play {
+  background-color: darkblue;
+
+  color: white;
+  font-size: 32px;
+  font-weight: bold;
+  font-family: "04b30";
+}
+
+@font-face {
+  font-family: "04b30";
+  src: url('./assets/fonts/04b30-webfont.woff2') format('woff2'),
+       url('./assets/fonts/04b30-webfont.woff') format('woff');
+}
