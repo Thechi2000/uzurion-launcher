@@ -60,10 +60,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
-        "resizable": true,
+        "height": 720,
+        "resizable": false,
         "title": "uzurion-launcher",
-        "width": 800
+        "width": 1280
       }
     ]
   }

@@ -23,7 +23,7 @@ function App() {
       <h1 id="title">Uzurion</h1>
 
       <div id="app-menu">
-        <div className="vertical-container">
+        <div className="vertical-container left">
           <Accounts/>
           <Settings/>
         </div>
@@ -31,7 +31,7 @@ function App() {
           <button id="play" onClick={() => play()}>Play</button>
           <Socials/>
         </div>
-        <div className="vertical-container">
+        <div className="vertical-container right">
           <Status/>
         </div>
       </div>
