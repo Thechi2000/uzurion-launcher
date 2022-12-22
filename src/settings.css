@@ -57,7 +57,7 @@
     justify-content: center;
 }
 
-#settings-logo * {
+#settings-logo-image {
     filter: invert(100%) sepia(0%) saturate(371%) hue-rotate(146deg) brightness(112%) contrast(73%);
     cursor: pointer;
 }
