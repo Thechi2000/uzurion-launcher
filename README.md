@@ -1,7 +1,14 @@
 # Tauri + Next.js + Typescript
 
-This template should help get you started developing with Tauri, Next.js and Typescript.
+## Development
+Requirements:
+- [npm](https://www.npmjs.com/) (through [node](https://nodejs.org/en/download/)) for NextJS
+- [cargo](rustup.rs) for Rust
 
-## Recommended IDE Setup
+To run the app for dev, use
+> `npm run tauri dev`
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+## References
+- Tauri [book](https://jonaskruckenberg.github.io/tauri-docs-wip/introduction.html) (WIP), [docs](https://docs.rs/tauri/latest) or [website](https://tauri.app/)
+- [NextJS](https://nextjs.org/)
+- Rust [book](https://doc.rust-lang.org/book/) or [docs](https://docs.rs)
