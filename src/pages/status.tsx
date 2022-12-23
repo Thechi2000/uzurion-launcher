@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { listen, emit } from '@tauri-apps/api/event'
 import { appWindow, WebviewWindow } from '@tauri-apps/api/window'
+import { debug } from 'tauri-plugin-log-api'
 
 
 export default function Status() {
@@ -10,6 +11,7 @@ export default function Status() {
     
     useEffect(() => {
         listen("server-status", (e) => {
+            debug("Received server-status event with payload " + JSON.stringify(e.payload))
             setStatus(e.payload)
         })
     }, []);
