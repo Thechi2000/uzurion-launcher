@@ -51,6 +51,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  align-items: center;
 }
 
 #app-menu .vertical-container {
@@ -60,7 +61,7 @@
   text-align: center;
 
   height: 90%;
-  width: 15%;
+  width: 10%;
 
   background-color: #111111AA;
 
@@ -80,6 +81,7 @@
   border-top-right-radius: 20px;
 }
 #app-menu .vertical-container + .right {
+  width:15%;
   border-top-left-radius: 20px;
   border-top-right-radius: 0;
 }

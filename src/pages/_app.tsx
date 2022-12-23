@@ -1,5 +1,6 @@
 import type { AppProps } from "next/app";
 
+import "../login.css"
 import "../settings.css";
 import "../style.css";
 import "../App.css";

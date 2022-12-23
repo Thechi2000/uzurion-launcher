@@ -11,6 +11,7 @@ function App() {
   const [modalWindow, setModalWindow] = useState(undefined)
 
   const settingsModalWindow = <Settings hide={() => setModalWindow(undefined)}/>
+  const loginModalWindow = <Login hide={() => setModalWindow(undefined)}/>
 
   async function play() {
     await invoke("play")
@@ -22,8 +23,8 @@ function App() {
         <h1 id="title">Uzurion</h1>
 
         <div id="app-menu">
-          <div className="vertical-container left">
-            <Accounts show={() => {}}/>
+          <div className="vertical-container">
+            <Accounts show={() => setModalWindow(loginModalWindow)}/>
             <SettingsLogo show={() => setModalWindow(settingsModalWindow)}/>
           </div>
           <div className="vertical-container center">

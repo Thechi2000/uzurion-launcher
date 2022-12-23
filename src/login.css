@@ -1,0 +1,29 @@
+#mojang-login {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#login-window * {
+    height: 100%;
+    width: 100%;
+    padding-top: 20%;
+    padding-bottom: 20%;
+}
+#login-window * * {
+    height: auto;
+    width: auto;
+
+    padding: 0;
+}
+
+#login-window button {
+    width: 40%;
+    height: 12%;
+
+    background-color: #0000AA;
+    color: beige;
+
+    border-radius: 5px;
+}
