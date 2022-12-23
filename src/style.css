@@ -47,10 +47,13 @@
 }
 
 .vertical-container {
-  margin: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+}
+
+#app-menu .vertical-container {
+  margin: 0;
   
   align-self: flex-end;
   text-align: center;
@@ -62,20 +65,20 @@
 
   border-top-right-radius: 20px;
 }
-.vertical-container * {
+#app-menu .vertical-container * {
   margin: 5%;
   height: 100%;
 }
-.vertical-container * * {
+#app-menu .vertical-container * * {
   height: auto;
 }
 
-.vertical-container + .center {
+#app-menu .vertical-container + .center {
   width: 35%;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
 }
-.vertical-container + .right {
+#app-menu .vertical-container + .right {
   border-top-left-radius: 20px;
   border-top-right-radius: 0;
 }

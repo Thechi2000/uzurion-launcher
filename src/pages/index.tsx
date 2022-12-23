@@ -5,9 +5,12 @@ import Accounts from "./accounts";
 import Socials from "./socials";
 import Status from "./status";
 import Settings from "./settings";
+import Login from "./login/login";
 
 function App() {
-  const [settingsVisibility, setSettingsVisibility] = useState(false);
+  const [modalWindow, setModalWindow] = useState(undefined)
+
+  const settingsModalWindow = <Settings hide={() => setModalWindow(undefined)}/>
 
   async function play() {
     await invoke("play")
@@ -20,8 +23,8 @@ function App() {
 
         <div id="app-menu">
           <div className="vertical-container left">
-            <Accounts/>
-            <SettingsLogo setSettingsVisibility={setSettingsVisibility}/>
+            <Accounts show={() => {}}/>
+            <SettingsLogo show={() => setModalWindow(settingsModalWindow)}/>
           </div>
           <div className="vertical-container center">
             <button id="play" onClick={() => play()}>Play</button>
@@ -33,7 +36,7 @@ function App() {
         </div>
       </div>
 
-      <Settings visibility={settingsVisibility} setVisibility={setSettingsVisibility}/>
+      {modalWindow}
     </div>
     );
 }

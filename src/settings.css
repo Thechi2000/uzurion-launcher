@@ -1,4 +1,4 @@
-#settings-canvas {
+.modal-window-canvas {
     z-index: 5;
     background-color: #222222BB;
     width: 100%;
@@ -13,6 +13,18 @@
     left: 0;
  
     color: beige;
+}
+
+.modal-window {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #222222EE;
+
+    width: 30%;
+    height: 60%;
+
+    border: #000088 solid;
 }
 
 .settings-parameters {
@@ -30,18 +42,6 @@
 }
 .settings-parameters * * {
     width: auto;
-}
-
-#settings {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background-color: #222222EE;
-
-    width: 30%;
-    height: 60%;
-
-    border: #000088 solid;
 }
 
 #settings-navigator {
