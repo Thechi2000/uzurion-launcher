@@ -8,6 +8,7 @@ use tauri::Manager;
 use crate::server_status::{refresh_server_status, start_fetch_server_status_task};
 
 mod server_status;
+mod login;
 
 #[tauri::command]
 fn play() {
@@ -52,7 +53,7 @@ async fn main() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![play])
+        .invoke_handler(tauri::generate_handler![play, login::mojang_login])
         .run(tauri::generate_context!("tauri.conf.json"))
         .expect("error while running tauri application");
 }

@@ -5,6 +5,15 @@
     align-items: center;
 }
 
+#mojang-login * {
+    margin: 5px;
+}
+
+#mojang-login button {
+    width: 20%;
+    background-color: aliceblue;
+}
+
 #login-window * {
     height: 100%;
     width: 100%;
