@@ -54,15 +54,11 @@ async fn fetch_server_status_task(ip: String, tx: AppHandle<Wry>) {
     let mut interval = tokio::time::interval(Duration::from_secs(5));
 
     loop {
-        refresh_server_status(ip.as_str(), tx.clone());
+        refresh_server_status(ip.as_str(), tx.clone()).await;
         interval.tick().await;
     }
 }
 
 pub fn start_fetch_server_status_task(app: &mut App<Wry>, ip: &str) {
     tokio::task::spawn(fetch_server_status_task(ip.to_string(), app.handle()));
-}
-
-pub fn start_server_status_refresh_listener(){
-
 }
