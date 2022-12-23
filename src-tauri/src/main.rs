@@ -3,12 +3,9 @@ all(not(debug_assertions), target_os = "windows"),
 windows_subsystem = "windows"
 )]
 
-use std::cell::Cell;
-use std::sync::Arc;
-use log::info;
-use tauri::async_runtime::Mutex;
+use log::trace;
 use tauri::Manager;
-use crate::server_status::{fetch_server_status_task, ServerStatus};
+use crate::server_status::{refresh_server_status, start_fetch_server_status_task};
 
 mod server_status;
 
@@ -17,15 +14,11 @@ fn play() {
     println!("Have fun :)")
 }
 
-pub struct AppState {
-    pub server_status: Arc<Mutex<Cell<Option<ServerStatus>>>>,
-}
+pub struct AppState {}
 
 impl Default for AppState {
     fn default() -> Self {
-        AppState {
-            server_status: Arc::new(Mutex::new(Cell::new(None))),
-        }
+        AppState {}
     }
 }
 
@@ -49,7 +42,14 @@ async fn main() {
         )
         .setup(|app| {
             // Start server status fetching task
-            tokio::task::spawn(fetch_server_status_task(IP, app.state::<AppState>().server_status.clone()));
+            start_fetch_server_status_task(app, IP);
+
+            let handle = app.handle();
+            app.listen_global("refresh-server-status", move |_| {
+                trace!("Manually refreshing server status");
+                tokio::spawn(refresh_server_status(IP, handle.clone()));
+            });
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![play])
