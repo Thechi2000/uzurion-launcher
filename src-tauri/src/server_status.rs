@@ -2,6 +2,7 @@ use std::time::Duration;
 use log::{debug, info, warn};
 use serde::{Deserialize, Serialize};
 use tauri::{App, AppHandle, Manager, Wry};
+use crate::consts::*;
 
 #[derive(Serialize, Deserialize, Clone, Copy)]
 pub struct ServerStatus {
@@ -20,7 +21,7 @@ pub struct PlayersStatus {
 async fn fetch_server_status(ip: &str) -> Result<ServerStatus, String> {
     // Using https://api.mcsrvstat.us/ api to get server status
     reqwest::get(format!("https://api.mcsrvstat.us/2/{ip}")).await
-        .map_err(|e| format!("Could not send request to mcapi: {:?}", e))?.json::<ServerStatus>().await.map_err(|e| format!("Could not parse response: {:?}", e))
+        .map_err(|e| format!("Could not send request to https://api.mcsrvstat.us/2/: {:?}", e))?.json::<ServerStatus>().await.map_err(|e| format!("Could not parse response: {:?}", e))
 }
 
 pub async fn refresh_server_status(ip: &str, tx: AppHandle<Wry>) {
@@ -32,20 +33,18 @@ pub async fn refresh_server_status(ip: &str, tx: AppHandle<Wry>) {
         Ok(status) => {
             debug!("Received state {:?}", serde_json::to_string(&status));
 
-            if let Err(e) = tx.emit_all("server-status", Some(status)) {
+            if let Err(e) = tx.emit_all(events::SERVER_STATUS_REFRESH, Some(status)) {
                 warn!("Could not send ServerStatus: {:?}", e);
             }
         }
         Err(e) => {
             warn!("Could not fetch server status: {:?}", e);
-            if let Err(e) = tx.emit_all(SERVER_STATUS_EVENT, Option::<ServerStatus>::None) {
+            if let Err(e) = tx.emit_all(events::SERVER_STATUS_REFRESH, Option::<ServerStatus>::None) {
                 warn!("Could not send ServerStatus: {:?}", e);
             }
         }
     }
 }
-
-const SERVER_STATUS_EVENT: &'static str = "server-status";
 
 async fn fetch_server_status_task(ip: String, tx: AppHandle<Wry>) {
     info!("Server status fetching task started");
