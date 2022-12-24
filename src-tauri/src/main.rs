@@ -3,23 +3,32 @@ all(not(debug_assertions), target_os = "windows"),
 windows_subsystem = "windows"
 )]
 
+use std::sync::Arc;
 use log::trace;
 use tauri::Manager;
+use tokio::sync::Mutex;
 use crate::server_status::{refresh_server_status, start_fetch_server_status_task};
+use crate::settings::Settings;
 
 mod server_status;
 mod login;
+mod settings;
+mod consts;
 
 #[tauri::command]
 fn play() {
     println!("Have fun :)")
 }
 
-pub struct AppState {}
+pub struct AppState {
+    pub settings: Arc<Mutex<Settings>>,
+}
 
 impl Default for AppState {
     fn default() -> Self {
-        AppState {}
+        AppState {
+            settings: Arc::new(Mutex::new(Settings::default())),
+        }
     }
 }
 
@@ -53,7 +62,7 @@ async fn main() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![play, login::mojang_login])
+        .invoke_handler(tauri::generate_handler![play, login::mojang_login, settings::set_settings])
         .run(tauri::generate_context!("tauri.conf.json"))
         .expect("error while running tauri application");
 }
