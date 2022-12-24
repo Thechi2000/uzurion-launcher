@@ -6,11 +6,19 @@ import Socials from "./socials";
 import Status from "./status";
 import Settings from "./settings";
 import Login from "./login/login";
+import { debug } from "tauri-plugin-log-api";
 
 function App() {
   const [modalWindow, setModalWindow] = useState(undefined)
 
-  const settingsModalWindow = <Settings hide={() => setModalWindow(undefined)}/>
+  const [settings, setSettings] = useState({
+    'game': {
+      'ram': 1024,
+      'resolution': [1920, 1080]
+    }
+  })
+
+  const settingsModalWindow = <Settings settings={settings} setSettings={setSettings} hide={() => setModalWindow(undefined)}/>
   const loginModalWindow = <Login hide={() => setModalWindow(undefined)}/>
 
   async function play() {
