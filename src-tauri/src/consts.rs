@@ -1,5 +1,5 @@
 pub mod files {
-    pub const SETTINGS: &str = "./settings.json";
+    pub const SETTINGS: &str = "../settings.json";
 }
 
 pub mod events {

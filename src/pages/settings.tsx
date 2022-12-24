@@ -1,26 +1,60 @@
+import { listen } from "@tauri-apps/api/event"
+import { invoke } from "@tauri-apps/api/tauri"
 import { useEffect, useState } from "react"
-import { debug } from "tauri-plugin-log-api"
+import { debug, error, trace } from "tauri-plugin-log-api"
+import { useEffectOnce } from "usehooks-ts"
 
-export default function Settings({settings, setSettings, hide}){
+export default function Settings({hide}){
     const [selectedPane, setSelectedPane] = useState("game")
+    const [settings, setSettings] = useState({})
+    const [settingsLoaded, setSetingsLoaded] = useState(false)
 
-    function updateGameValue(idx, value) {
-        debug(`Updating game ${idx} to ${value}`)
+    const [ram, setRam] = useState(1024)
+    const [resolution, setResolution] = useState([1920, 1080])
+
+    async function updateSetting(type, idx, value) {
+        debug(`Updating ${type} ${idx} to ${value}`)
 
         var set = Object.assign({}, settings)
-        set["game"][idx] = value
+        set[type][idx] = value
 
-        setSettings(set)
-    }
-    function updateResolution(value){
-        value = value.split("x")
-        updateGameValue("resolution", [parseInt(value[0]), parseInt(value[1])])
+        await invoke("set_settings", {settings: set}).catch(e => error(e))
     }
 
     useEffect(() => {
-        debug(JSON.stringify(settings))
-        document.getElementById("resolution-input").setAttribute("value", `${settings['game']['resolution'][0]}x${settings['game']['resolution'][1]}`)
-        document.getElementById("ram-input").setAttribute('value', settings['game']['ram'])
+        if(settingsLoaded) {
+            setResolution(settings['game']['resolution'])
+            setRam(settings['game']['ram'])
+            debug("####" + resolution.join('x'))
+            debug("####" + ram)
+            debug("#####" + document.getElementById('resolution-input').getAttribute('value'))
+        }
+    }, [settings, settingsLoaded])
+
+    function genResolutionOptions(values){
+        return values.map(r => {
+            let str = `${r[0]}x${r[1]}`
+            return <option value={str}>{str}</option>
+        })
+    }
+
+
+    useEffect(() => {
+        trace("Registering settings listener")
+
+        let unlistener = listen('settings-update', e => {
+            debug(`Updating settings to ${JSON.stringify(e.payload)}`)
+            setSettings(e.payload)
+        })
+
+        return () => {
+            trace("Unregistering settings-update listener")
+            unlistener.then(u => u())
+        }
+    })
+
+    useEffectOnce(() => {
+        invoke('get_settings').then(() => setSetingsLoaded(true))
     })
     
 
@@ -31,14 +65,17 @@ export default function Settings({settings, setSettings, hide}){
                     <div className="settings-parameters">
                         <div>
                             <span className="setting-name">RAM: </span>
-                            <input id="ram-input" type="range" onChange={e => updateGameValue('ram', parseInt(e.target.value))} min={1024} max={16384}/>
+                            <input value={ram} type="range" onChange={e => updateSetting('game', 'ram', parseInt(e.target.value))} min={1024} max={16384}/>
+                            <input value={ram} type="number" onChange={e => updateSetting('game', 'ram', parseInt(e.target.value))} min={1024} max={16384}/>
                         </div>
         
                         <div>
                             <span className="setting-name">Resolution:</span>
-                            <select id="resolution-input" onChange={e => updateResolution(e.target.value)}>
-                                <option value="1920x1080">1920x1080</option>
-                                <option value="2560x1440">2560x1440</option>
+                            <select id="resolution-input" value={resolution.map(p=>p.toString()).join('x')} onChange={e => updateSetting('game', 'resolution', e.target.value.split('x').map(i => parseInt(i)))}>
+                                {genResolutionOptions([
+                                    [1920, 1080],
+                                    [2560, 1440],
+                                ])}
                             </select>
                         </div>
                     </div>  

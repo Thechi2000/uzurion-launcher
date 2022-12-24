@@ -4,11 +4,12 @@ windows_subsystem = "windows"
 )]
 
 use std::sync::Arc;
-use log::trace;
+use std::time::Duration;
+use log::{error, trace};
 use tauri::Manager;
 use tokio::sync::Mutex;
 use crate::server_status::{refresh_server_status, start_fetch_server_status_task};
-use crate::settings::Settings;
+use crate::settings::{set_settings, Settings};
 
 mod server_status;
 mod login;
@@ -55,6 +56,11 @@ async fn main() {
             start_fetch_server_status_task(app, IP);
 
             let handle = app.handle();
+            tokio::spawn(async move {
+                *handle.state::<AppState>().settings.lock().await = Settings::load().await.unwrap_or_default()
+            });
+
+            let handle = app.handle();
             app.listen_global("refresh-server-status", move |_| {
                 trace!("Manually refreshing server status");
                 tokio::spawn(refresh_server_status(IP, handle.clone()));
@@ -62,7 +68,7 @@ async fn main() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![play, login::mojang_login, settings::set_settings])
+        .invoke_handler(tauri::generate_handler![play, login::mojang_login, settings::set_settings, settings::get_settings])
         .run(tauri::generate_context!("tauri.conf.json"))
         .expect("error while running tauri application");
 }
