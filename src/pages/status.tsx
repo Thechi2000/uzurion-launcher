@@ -3,17 +3,22 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { listen, emit } from '@tauri-apps/api/event'
 import { appWindow, WebviewWindow } from '@tauri-apps/api/window'
-import { debug } from 'tauri-plugin-log-api'
+import { debug, trace } from 'tauri-plugin-log-api'
 
 
 export default function Status() {
     const [status, setStatus] = useState(undefined)
     
     useEffect(() => {
-        listen("server-status", (e) => {
+        let unlistener = listen("server-status", (e) => {
             debug("Received server-status event with payload " + JSON.stringify(e.payload))
             setStatus(e.payload)
         })
+
+        return () => {
+            trace("Unregistering status listener")
+            unlistener.then(u => u())
+        }
     }, []);
     
     function isOnline(){
