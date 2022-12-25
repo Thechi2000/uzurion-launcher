@@ -17,7 +17,7 @@ use crate::update::{convert_hash_algorithm, Error, FileInfo, hash_file, Info, sc
 /// Messages sent from the update task
 pub enum Message {
     /// (id, total_size, path) Created a new download state
-    AddState(u32, u64, Option<String>),
+    AddState(u32, u64, String),
     /// (id, done) Updated download with done bytes downloaded
     UpdateState(u32, u64),
 
@@ -68,7 +68,7 @@ struct DownloadStateHandle {
 }
 
 impl DownloadStateHandle {
-    async fn new(id: u32, sender: Sender<Message>, total_size: u64, name: Option<String>) -> Result<DownloadStateHandle, SendError<Message>> {
+    async fn new(id: u32, sender: Sender<Message>, total_size: u64, name: String) -> Result<DownloadStateHandle, SendError<Message>> {
         sender.send(Message::AddState(id, total_size, name)).await?;
         Ok(Self {
             id,
@@ -140,7 +140,7 @@ pub async fn update(sender: Sender<Message>, fetch_url: String, download_dir: St
     }
 }
 
-async fn generate_download_request<'r>(client: &Client, info: &Info, file_info: &FileInfo, id: u32, sender: Sender<Message>, dl_dir: &PathBuf) -> Result<Option<(Response, DownloadStateHandle, PathBuf)>, Error> {
+async fn generate_download_request<'r>(client: &Client, info: &Info, file_info: &FileInfo, id: u32, sender: Sender<Message>, dl_dir: &Path) -> Result<Option<(Response, DownloadStateHandle, PathBuf)>, Error> {
     let url = Url::parse(info.base_url.as_str())?.join(&file_info.path)?;
     let path = dl_dir.join(&file_info.path);
 
@@ -158,7 +158,7 @@ async fn generate_download_request<'r>(client: &Client, info: &Info, file_info: 
             .content_length()
             .ok_or_else(|| "Failed to get content length".to_string())?;
 
-        let state = DownloadStateHandle::new(id, sender, total_size, path.to_str().map(|s| s.to_owned())).await?;
+        let state = DownloadStateHandle::new(id, sender, total_size, file_info.path.as_str().to_owned()).await?;
         Ok(Some((res, state, path)))
     } else {
         Ok(None)

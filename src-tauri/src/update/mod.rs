@@ -97,7 +97,7 @@ fn convert_hash_algorithm(name: &str) -> Option<&'static Algorithm> {
 #[serde(tag = "type", rename_all = "snake_case")]
 enum Message {
     /// Updated total downloads with done bytes downloaded
-    UpdateState { name: Option<String>, done: u64, total: u64 },
+    UpdateState { name: String, done: u64, total: u64 },
 
     /// Starting update process
     Start,
