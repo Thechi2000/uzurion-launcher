@@ -1,4 +1,5 @@
 #![allow(unused)]
+
 ///! Imported from https://www.github.com/Thechi2000/bootstrap
 
 use std::collections::HashMap;
@@ -93,9 +94,10 @@ fn convert_hash_algorithm(name: &str) -> Option<&'static Algorithm> {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
+#[serde(tag = "type", rename_all = "snake_case")]
 enum Message {
-    /// (name, done, total) Updated total downloads with done bytes downloaded
-    UpdateState(Option<String>, u64, u64),
+    /// Updated total downloads with done bytes downloaded
+    UpdateState { name: Option<String>, done: u64, total: u64 },
 
     /// Starting update process
     Start,
@@ -106,7 +108,7 @@ enum Message {
     /// Update completed
     DownloadDone,
     /// Update failed
-    Failure
+    Failure,
 }
 
 #[tauri::command]
@@ -131,15 +133,15 @@ pub async fn check_update(app: AppHandle<Wry>) {
                 let Some((name, already_done, size)) = map.get(&id).cloned() else {
                     error!("Unknown id received");
                     continue;
-                } ;
+                };
 
                 total_done = total_done - already_done + done;
                 map.insert(id, (name.clone(), done, size));
 
-                Message::UpdateState(name, done, total)
+                Message::UpdateState { name, done, total }
             }
             updater::Message::FetchDone => {
-                    Message::FetchDone
+                Message::FetchDone
             }
             updater::Message::CleanDone => {
                 Message::CleanDone
