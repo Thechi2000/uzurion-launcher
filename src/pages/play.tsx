@@ -20,11 +20,7 @@ export default function Play(){
             case 'cleaning':
                 return 'Cleaning game folder'
             case 'downloading':
-                if(download != undefined && download != null) {
-                    return `Downloading '${download}'`
-                } else {
-                    return 'Downloading'
-                }
+                return <span>Downloading<br/>{download}</span>
             default:
                 undefined
         }
@@ -86,7 +82,7 @@ export default function Play(){
             <button id="play-button" style={{ display:updateStage === undefined ? 'inherit': 'none' }} onClick={() => play()}>Play</button>
             <div id="update" style={{ display:updateStage === undefined ? 'none': 'contents' }}>
                 <div id="update-stage-description" className="vertical-container">
-                    <div><span>{stageDescription()}</span></div>
+                    <div>{stageDescription()}</div>
                     <div id="update-stage-progress-bar" style={{display:updateStage === 'downloading' ? 'inherit': 'none'}}><div style={{width: `${doneDownload/totalDownload * 100}%`}}></div></div>
                 </div>
             </div>
