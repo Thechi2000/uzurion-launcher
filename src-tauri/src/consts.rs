@@ -9,13 +9,16 @@ pub mod events {
     pub const GAME_UPDATE: &str = "game-update";
 }
 
-pub const GAME_UPDATE_URL: &str = "localhost:1234";
+pub const GAME_UPDATE_URL: &str = "http://127.0.0.1:8000";
 
 #[macro_export]
 macro_rules! send_event {
     ($app: expr, $event: expr, $payload: expr) => {
-        if let Err(e) = ::tauri::Manager::emit_all(&$app, $event, $payload){
-            ::log::error!("Could not send {} event: {:?}", $event, e);
+        {
+            ::log::debug!("Sending event {} with payload {:?}", $event, ::serde_json::to_string(&$payload));
+            if let Err(e) = ::tauri::Manager::emit_all(&$app, $event, $payload){
+                ::log::error!("Could not send {} event: {:?}", $event, e);
+            }
         }
     };
 }
