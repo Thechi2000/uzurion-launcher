@@ -1,3 +1,4 @@
+import { invoke } from "@tauri-apps/api/tauri";
 import { useState } from "react";
 import MojangLogin from "./mojang-login";
 
@@ -8,7 +9,7 @@ export default function Login({hide}){
     const loginSelection = (
         <div className="vertical-container">
             <button onClick={() => setLoginPane(mojangLogin)}>Mojang</button>
-            <button onClick={() => window.location.replace("https://www.epfl.ch")}>Microsoft</button>
+            <button onClick={() => invoke('microsoft_login')}>Microsoft</button>
             <button onClick={hide}>Quit</button>
         </div>
     );

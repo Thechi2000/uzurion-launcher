@@ -5,9 +5,10 @@ windows_subsystem = "windows"
 
 use std::sync::Arc;
 
-use log::{trace};
-use tauri::Manager;
+use log::{trace, warn};
+use tauri::{Manager, WindowEvent};
 use tokio::sync::Mutex;
+use crate::consts::*;
 use crate::server_status::{refresh_server_status, start_fetch_server_status_task};
 use crate::settings::{Settings};
 
@@ -53,6 +54,8 @@ async fn main() {
                      .build(),
         )
         .setup(|app| {
+            let main_window = app.get_window(windows::MAIN).unwrap();
+
             // Start server status fetching task
             start_fetch_server_status_task(app, IP);
 
@@ -67,9 +70,28 @@ async fn main() {
                 tokio::spawn(refresh_server_status(IP, handle.clone()));
             });
 
+            // Force to give focus to microsoft-login if it exists
+            let handle = app.app_handle();
+            main_window.on_window_event(move |e| {
+                if let WindowEvent::Focused(_) = e {
+                    if let Some(window) = handle.get_window(windows::MICROSOFT_LOGIN) {
+                        if let Err(e) = window.set_focus() {
+                            warn!("Could not set focus to microsoft-login window: {:?}", e);
+                        }
+                    }
+                }
+            });
+
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![play, login::mojang_login, settings::set_settings, settings::get_settings, update::check_update])
+        .invoke_handler(tauri::generate_handler![
+            play,
+            login::mojang_login,
+            login::microsoft_login,
+            settings::set_settings,
+            settings::get_settings,
+            update::check_update
+        ])
         .run(tauri::generate_context!("tauri.conf.json"))
         .expect("error while running tauri application");
 }

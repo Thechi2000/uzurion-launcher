@@ -9,6 +9,11 @@ pub mod events {
     pub const GAME_UPDATE: &str = "game-update";
 }
 
+pub mod windows {
+    pub const MAIN: &str = "main";
+    pub const MICROSOFT_LOGIN: &str = "microsoft-login";
+}
+
 pub const GAME_UPDATE_URL: &str = "http://127.0.0.1:8000";
 
 #[macro_export]
