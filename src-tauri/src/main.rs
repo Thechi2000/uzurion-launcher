@@ -3,12 +3,14 @@ all(not(debug_assertions), target_os = "windows"),
 windows_subsystem = "windows"
 )]
 
+use std::net::SocketAddr;
 use std::sync::Arc;
 
 use log::{trace, warn};
 use tauri::{Manager, WindowEvent};
 use tokio::sync::Mutex;
 use crate::consts::*;
+use crate::routing::start_server;
 use crate::server_status::{refresh_server_status, start_fetch_server_status_task};
 use crate::settings::{Settings};
 
@@ -17,6 +19,7 @@ mod login;
 mod settings;
 mod consts;
 mod update;
+mod routing;
 
 #[tauri::command]
 fn play() {
@@ -58,6 +61,9 @@ async fn main() {
 
             // Start server status fetching task
             start_fetch_server_status_task(app, IP);
+
+            let handle = app.handle();
+            tokio::spawn(start_server(SocketAddr::from(([127, 0, 0, 1], 3000)), handle));
 
             let handle = app.handle();
             tokio::spawn(async move {

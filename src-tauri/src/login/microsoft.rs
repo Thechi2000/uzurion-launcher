@@ -1,6 +1,7 @@
 use log::{error, trace};
 use tauri::{AppHandle, Manager, WindowBuilder, WindowUrl, Wry};
 use url::{ParseError, Url};
+use crate::consts::LOCAL_WEBSERVER_URL;
 
 
 fn generate_microsoft_auth_url(state: &str, code_challenge: &str) -> Result<Url, ParseError> {
@@ -9,8 +10,8 @@ fn generate_microsoft_auth_url(state: &str, code_challenge: &str) -> Result<Url,
         [
             ("client_id", env!("CLIENT_ID")),
             ("response_type", "code"),
-            ("redirect_url", "http://localhost:1420"), // TODO use dynamic port
-            ("redirect_uri", "http://localhost:1420/microsoft-auth/"), // TODO use dynamic port
+            ("redirect_url", LOCAL_WEBSERVER_URL), // TODO use dynamic port
+            ("redirect_uri", format!("{LOCAL_WEBSERVER_URL}/microsoft-auth").as_str()), // TODO use dynamic port
             ("scope", "XboxLive.signin"),
             ("code_challenge_method", "S256"),
             ("code_challenge", code_challenge),

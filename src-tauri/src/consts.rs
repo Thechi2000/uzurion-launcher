@@ -15,6 +15,7 @@ pub mod windows {
 }
 
 pub const GAME_UPDATE_URL: &str = "http://127.0.0.1:8000";
+pub const LOCAL_WEBSERVER_URL: &str = "http://127.0.0.1:7878";
 
 #[macro_export]
 macro_rules! send_event {

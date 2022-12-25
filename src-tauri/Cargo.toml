@@ -17,9 +17,9 @@ tauri-build = { version = "1.2", features = [] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 
+hyper = { version = "1.0.0-rc.1", features = ["full"] }
 reqwest = { version = "0.11.13", features = ["json", "stream"] }
 url = "2.3.1"
-uuid = { version = "1.2.2", features = ["serde"] }
 
 tauri = { version = "1.2", features = ["shell-open"] }
 tauri-plugin-log = { git = "https://github.com/tauri-apps/tauri-plugin-log" }
@@ -33,6 +33,7 @@ tokio = { version = "1.23.0", features = ["macros"] }
 futures-util = "0.3.25"
 
 chrono = "0.4.23"
+uuid = { version = "1.2.2", features = ["serde"] }
 
 [features]
 # by default Tauri runs in production mode
