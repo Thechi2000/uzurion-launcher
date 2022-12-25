@@ -4,17 +4,18 @@ windows_subsystem = "windows"
 )]
 
 use std::sync::Arc;
-use std::time::Duration;
-use log::{error, trace};
+
+use log::{trace};
 use tauri::Manager;
 use tokio::sync::Mutex;
 use crate::server_status::{refresh_server_status, start_fetch_server_status_task};
-use crate::settings::{set_settings, Settings};
+use crate::settings::{Settings};
 
 mod server_status;
 mod login;
 mod settings;
 mod consts;
+mod update;
 
 #[tauri::command]
 fn play() {
@@ -68,7 +69,7 @@ async fn main() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![play, login::mojang_login, settings::set_settings, settings::get_settings])
+        .invoke_handler(tauri::generate_handler![play, login::mojang_login, settings::set_settings, settings::get_settings, update::check_update])
         .run(tauri::generate_context!("tauri.conf.json"))
         .expect("error while running tauri application");
 }
