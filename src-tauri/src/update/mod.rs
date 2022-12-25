@@ -138,7 +138,7 @@ pub async fn check_update(app: AppHandle<Wry>) {
                 total_done = total_done - already_done + done;
                 map.insert(id, (name.clone(), done, size));
 
-                Message::UpdateState { name, done, total }
+                Message::UpdateState { name, done: total_done, total }
             }
             updater::Message::FetchDone => {
                 Message::FetchDone
