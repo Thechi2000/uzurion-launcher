@@ -54,7 +54,7 @@
   align-items: center;
 }
 
-#app-menu .vertical-container {
+#app-menu > .vertical-container {
   margin: 0;
   
   align-self: flex-end;
@@ -67,20 +67,20 @@
 
   border-top-right-radius: 20px;
 }
-#app-menu .vertical-container * {
+#app-menu > .vertical-container > * {
   margin: 5%;
   height: 100%;
 }
-#app-menu .vertical-container * * {
+#app-menu > .vertical-container > * > * {
   height: auto;
 }
 
-#app-menu .vertical-container + .center {
+#app-menu > .vertical-container + .center {
   width: 35%;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
 }
-#app-menu .vertical-container + .right {
+#app-menu > .vertical-container + .right {
   width:15%;
   border-top-left-radius: 20px;
   border-top-right-radius: 0;
@@ -98,39 +98,13 @@
   font-size: 24px;
 }
 
-#status * {
+#status > * {
   margin: 3%;
 }
 
 #status p{
   font-size: 16px;
   line-height: 30%;
-}
-
-#play {
-  background-color: blue;
-
-  color: white;
-  font-size: 40px;
-  font-weight: bold;
-  font-family: "04b30";
-
-  border-radius: 10px;
-
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-#play:hover {
-  border-color: darkblue;
-}
-
-@font-face {
-  font-family: "04b30";
-  src: url('./assets/fonts/04b30-webfont.woff2') format('woff2'),
-       url('./assets/fonts/04b30-webfont.woff') format('woff');
 }
 
 #socials {

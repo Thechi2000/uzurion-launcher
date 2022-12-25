@@ -9,6 +9,7 @@ import Login from "./login/login";
 import { debug, trace } from "tauri-plugin-log-api";
 import { listen } from "@tauri-apps/api/event";
 import { useEffectOnce } from 'usehooks-ts';
+import Play from "./play";
 
 function App() {
   const [modalWindow, setModalWindow] = useState(undefined)
@@ -16,10 +17,6 @@ function App() {
 
   const settingsModalWindow = <Settings hide={() => setModalWindow(undefined)}/>
   const loginModalWindow = <Login hide={() => setModalWindow(undefined)}/>
-
-  async function play() {
-    await invoke("play")
-  }
 
   return (
     <div>
@@ -32,7 +29,7 @@ function App() {
             <SettingsLogo show={() => setModalWindow(settingsModalWindow)}/>
           </div>
           <div className="vertical-container center">
-            <button id="play" onClick={() => play()}>Play</button>
+            <Play/>
             <Socials/>
           </div>
           <div className="vertical-container right">
