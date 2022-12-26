@@ -10,6 +10,7 @@ use log::{trace, warn};
 use tauri::{Manager, WindowEvent};
 use tokio::sync::Mutex;
 use crate::consts::*;
+use crate::login::MicrosoftLoginData;
 use crate::routing::start_server;
 use crate::server_status::{refresh_server_status, start_fetch_server_status_task};
 use crate::settings::{Settings};
@@ -28,12 +29,16 @@ fn play() {
 
 pub struct AppState {
     pub settings: Arc<Mutex<Settings>>,
+    pub microsoft_login: Arc<Mutex<MicrosoftLoginData>>,
+    pub client: reqwest::Client,
 }
 
 impl Default for AppState {
     fn default() -> Self {
         AppState {
-            settings: Arc::new(Mutex::new(Settings::default())),
+            settings: Arc::new(Mutex::default()),
+            microsoft_login: Arc::new(Mutex::default()),
+            client: reqwest::Client::new(),
         }
     }
 }

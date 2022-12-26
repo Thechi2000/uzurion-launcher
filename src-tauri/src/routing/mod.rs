@@ -1,9 +1,12 @@
 mod microsoft;
 
-use std::{convert::Infallible, net::SocketAddr, error::Error};
-use hyper::{Request, body::Bytes, service::service_fn, Response, StatusCode};
+use std::{convert::Infallible, net::SocketAddr};
+use std::collections::HashMap;
+use hyper::{Request, service::service_fn, Response, StatusCode};
 use hyper::server::conn::http1;
+use lazy_static::lazy_static;
 use log::{error, trace};
+use regex::Regex;
 use tauri::{AppHandle, Wry};
 use tokio::net::TcpListener;
 use crate::routing::microsoft::microsoft_auth;
@@ -12,7 +15,7 @@ async fn router(
     req: Request<hyper::body::Incoming>,
     handle: AppHandle<Wry>,
 ) -> Result<Response<String>, Infallible> {
-    trace!("Received request at {}", req.uri());
+    trace!("Received request at {} with {:?}", req.uri(), req.body());
 
     if req.uri().path() == "/microsoft-auth" {
         microsoft_auth(req, handle).await
@@ -43,4 +46,27 @@ pub async fn start_server(addr: SocketAddr, handle: AppHandle<Wry>) {
             }
         });
     }
+}
+
+fn parse_query(query: &str) -> HashMap<String, Option<String>> {
+    lazy_static! {
+        static ref QUERY_PARAM_REGEX: Regex = Regex::new(r"(\w+)(?:=([^&]*))?").unwrap();
+    }
+
+    let parameters = query.split('&');
+    let mut map = HashMap::new();
+
+    for param in parameters {
+        if let Some(m) = QUERY_PARAM_REGEX.captures(param) {
+            if let Some(name) = m.get(1) {
+                map.insert(name.as_str().to_owned(), m.get(2).map(|v| v.as_str().to_owned()));
+            } else {
+                error!("No name for parameter: {param}")
+            }
+        } else {
+            error!("Non matched parameter: {param}")
+        }
+    }
+
+    map
 }
