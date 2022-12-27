@@ -54,7 +54,7 @@ pub struct LauncherSettings {}
 
 #[tauri::command]
 pub async fn set_settings(settings: Settings, state: State<'_, AppState>, handle: AppHandle<Wry>) -> Result<(), ()> {
-    *state.settings.lock().await = settings.clone();
+    *state.settings.lock().unwrap() = settings.clone();
     debug!("Updating settings to {:?}", settings);
 
     let settings_json = match serde_json::to_string(&settings) {
@@ -79,7 +79,7 @@ pub async fn set_settings(settings: Settings, state: State<'_, AppState>, handle
 
 #[tauri::command]
 pub async fn get_settings(state: State<'_, AppState>, handle: AppHandle<Wry>) -> Result<(), ()> {
-    if let Err(e) = handle.emit_all(events::SETTINGS_UPDATE, state.settings.lock().await.clone()) {
+    if let Err(e) = handle.emit_all(events::SETTINGS_UPDATE, state.settings.lock().unwrap().clone()) {
         error!("Could not send {} event: {:?}", events::SETTINGS_UPDATE, e);
         Err(())
     } else {

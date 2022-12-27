@@ -8,7 +8,7 @@ use reqwest::Client;
 use tauri::{AppHandle, Manager, WindowBuilder, WindowUrl, Wry};
 use url::{ParseError, Url};
 
-mod requests;
+pub mod requests;
 
 // TODO Check that no confidential info gets logged
 
@@ -22,16 +22,20 @@ pub struct MicrosoftLoginData {
 
 impl MicrosoftLoginData {
     pub fn access_token(&self) -> Option<String> {
+        debug!("###3");
         self.access_token.as_ref().map(|s| s.0.clone())
     }
 
     pub async fn access_token_or_refresh(&mut self, client: &Client) -> Option<String> {
+        debug!("###0");
         self.refresh_access_token_if_needed(client).await;
+        debug!("###1");
         self.access_token()
     }
 
     async fn refresh_access_token_if_needed(&mut self, client: &Client) {
         if self.access_token.as_ref().map(|p| p.1 < Local::now()).unwrap_or(true) {
+            trace!("Refreshing Microsoft access token");
             if let Some(refresh_token) = &self.refresh_token {
                 match microsoft_token_request(
                     client,
@@ -51,6 +55,7 @@ impl MicrosoftLoginData {
                 .await
                 {
                     Ok(MicrosoftTokenResponse::Success { access_token, expires_in, .. }) => {
+                        trace!("Microsoft access token refreshed");
                         self.access_token = Some((access_token, Local::now() + Duration::seconds(expires_in as i64)))
                     }
                     Ok(MicrosoftTokenResponse::Error { error, error_description, .. }) => {
@@ -97,7 +102,7 @@ pub async fn microsoft_login(app: AppHandle<Wry>) {
     };
 
     let state = app.state::<AppState>();
-    let mut lock = state.microsoft_login.lock().await;
+    let mut lock = state.microsoft_login.lock().unwrap();
     lock.challenge = Some(challenge);
     lock.verifier = Some(verifier);
 
@@ -116,12 +121,17 @@ pub async fn microsoft_login(app: AppHandle<Wry>) {
 
 pub async fn receive_auth_code(code: String, handle: AppHandle<Wry>) {
     let state = handle.state::<AppState>();
-    let Some(verifier) = &state.microsoft_login.lock().await.verifier else {
-        error!("Missing PKCE code verifier");
-        return;
+    let verifier = {
+        let lock = state.microsoft_login.lock().unwrap();
+        if let Some(verifier) = &lock.verifier {
+            verifier.secret().clone()
+        } else {
+            error!("Missing PKCE code verifier");
+            return;
+        }
     };
 
-    trace!("Requesting access token");
+    trace!("Requesting Microsoft access token");
     let res = match microsoft_token_request(
         &state.client,
         microsoft::TENANT,
@@ -133,7 +143,7 @@ pub async fn receive_auth_code(code: String, handle: AppHandle<Wry>) {
             refresh_token: None,
             redirect_uri: format!("{LOCAL_WEBSERVER_URL}/microsoft-auth"),
             grant_type: "authorization_code".to_string(),
-            code_verifier: Some(verifier.secret().clone()),
+            code_verifier: Some(verifier),
             client_secret: None,
         },
     )
@@ -155,7 +165,7 @@ pub async fn receive_auth_code(code: String, handle: AppHandle<Wry>) {
             ..
         } => {
             let state = handle.state::<AppState>();
-            let mut state = state.microsoft_login.lock().await;
+            let mut state = state.microsoft_login.lock().unwrap();
             state.access_token = Some((access_token, Local::now() + Duration::seconds(expires_in as i64)));
             state.refresh_token = refresh_token;
         }

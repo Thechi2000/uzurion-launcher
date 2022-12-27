@@ -4,11 +4,10 @@ windows_subsystem = "windows"
 )]
 
 use std::net::SocketAddr;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use log::{trace, warn};
 use tauri::{Manager, WindowEvent};
-use tokio::sync::Mutex;
 use crate::consts::*;
 use crate::login::MicrosoftLoginData;
 use crate::routing::start_server;
@@ -72,7 +71,7 @@ async fn main() {
 
             let handle = app.handle();
             tokio::spawn(async move {
-                *handle.state::<AppState>().settings.lock().await = Settings::load().await.unwrap_or_default()
+                *handle.state::<AppState>().settings.lock().unwrap() = Settings::load().await.unwrap_or_default()
             });
 
             let handle = app.handle();
