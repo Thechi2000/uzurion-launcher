@@ -15,7 +15,7 @@ pub mod windows {
 }
 
 pub mod microsoft {
-    pub const TENANT: &str = "common";
+    pub const TENANT: &str = "consumers";
     pub const CLIENT_ID: &str = env!("CLIENT_ID");
 }
 

@@ -1,14 +1,10 @@
 use crate::consts::{microsoft, LOCAL_WEBSERVER_URL};
-use crate::login::microsoft::requests::{
-    microsoft_token_request, MicrosoftTokenForm, MicrosoftTokenResponse,
-};
+use crate::login::microsoft::requests::{microsoft_token_request, MicrosoftTokenForm, MicrosoftTokenResponse};
 use crate::AppState;
-use chrono::{DateTime, Duration, Local, NaiveDateTime, Utc};
+use chrono::{DateTime, Duration, Local};
 use log::{debug, error, trace, warn};
 use oauth2::{PkceCodeChallenge, PkceCodeVerifier};
-use reqwest::header::HeaderValue;
-use reqwest::{header, Body, Client, Error, Request, RequestBuilder};
-use serde::{Deserialize, Serialize};
+use reqwest::Client;
 use tauri::{AppHandle, Manager, WindowBuilder, WindowUrl, Wry};
 use url::{ParseError, Url};
 
@@ -26,7 +22,7 @@ pub struct MicrosoftLoginData {
 
 impl MicrosoftLoginData {
     pub fn access_token(&self) -> Option<String> {
-        self.access_token.map(|s| s.0.clone())
+        self.access_token.as_ref().map(|s| s.0.clone())
     }
 
     pub async fn access_token_or_refresh(&mut self, client: &Client) -> Option<String> {
@@ -35,35 +31,31 @@ impl MicrosoftLoginData {
     }
 
     async fn refresh_access_token_if_needed(&mut self, client: &Client) {
-        if self
-            .access_token
-            .map(|p| p.1 < Local::now())
-            .unwrap_or(true)
-        {
+        if self.access_token.as_ref().map(|p| p.1 < Local::now()).unwrap_or(true) {
             if let Some(refresh_token) = &self.refresh_token {
-                let res = match microsoft_token_request(
+                match microsoft_token_request(
                     client,
                     microsoft::TENANT,
                     MicrosoftTokenForm {
-                        tenant: "common".to_owned(),
-                        client_id: env!("CLIENT_ID").to_string(),
+                        tenant: microsoft::TENANT.to_owned(),
+                        client_id: microsoft::CLIENT_ID.to_string(),
                         scope: None,
                         code: None,
+                        refresh_token: Some(refresh_token.clone()),
                         redirect_uri: format!("{LOCAL_WEBSERVER_URL}/microsoft-auth"),
                         grant_type: "refresh_token".to_string(),
                         code_verifier: None,
                         client_secret: None,
                     },
-                ) {
-                    Ok(MicrosoftTokenResponse::Success {
-                        access_token,
-                        expires_in,
-                        ..
-                    }) => {
-                        self.access_token = Some((
-                            access_token,
-                            Local::now() + Duration::seconds(expires_in as i64),
-                        ))
+                )
+                .await
+                {
+                    Ok(MicrosoftTokenResponse::Success { access_token, expires_in, .. }) => {
+                        self.access_token = Some((access_token, Local::now() + Duration::seconds(expires_in as i64)))
+                    }
+                    Ok(MicrosoftTokenResponse::Error { error, error_description, .. }) => {
+                        error!("Request for access_token failed with {error}: {error_description}");
+                        return;
                     }
                     Err(e) => {
                         error!("Request for access_token failed: {:?}", e);
@@ -79,15 +71,12 @@ impl MicrosoftLoginData {
 
 fn generate_microsoft_auth_url(state: &str, code_challenge: &str) -> Result<Url, ParseError> {
     Url::parse_with_params(
-        "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+        format!("https://login.microsoftonline.com/{}/oauth2/v2.0/authorize", microsoft::TENANT).as_str(),
         [
-            ("client_id", env!("CLIENT_ID")),
+            ("client_id", microsoft::CLIENT_ID),
             ("response_type", "code"),
-            ("redirect_url", LOCAL_WEBSERVER_URL), // TODO use dynamic port
-            (
-                "redirect_uri",
-                format!("{LOCAL_WEBSERVER_URL}/microsoft-auth").as_str(),
-            ), // TODO use dynamic port
+            ("redirect_url", LOCAL_WEBSERVER_URL),                                      // TODO use dynamic port
+            ("redirect_uri", format!("{LOCAL_WEBSERVER_URL}/microsoft-auth").as_str()), // TODO use dynamic port
             ("scope", "XboxLive.signin offline_access"),
             ("code_challenge_method", "S256"),
             ("code_challenge", code_challenge),
@@ -138,9 +127,10 @@ pub async fn receive_auth_code(code: String, handle: AppHandle<Wry>) {
         microsoft::TENANT,
         MicrosoftTokenForm {
             tenant: microsoft::TENANT.to_owned(),
-            client_id: env!("CLIENT_ID").to_string(),
+            client_id: microsoft::CLIENT_ID.to_string(),
             scope: None,
             code: Some(code),
+            refresh_token: None,
             redirect_uri: format!("{LOCAL_WEBSERVER_URL}/microsoft-auth"),
             grant_type: "authorization_code".to_string(),
             code_verifier: Some(verifier.secret().clone()),
@@ -164,18 +154,12 @@ pub async fn receive_auth_code(code: String, handle: AppHandle<Wry>) {
             refresh_token,
             ..
         } => {
-            let mut state = handle.state::<AppState>().microsoft_login.lock().await;
-            state.access_token = Some((
-                access_token,
-                Local::now() + Duration::seconds(expires_in as i64),
-            ));
+            let state = handle.state::<AppState>();
+            let mut state = state.microsoft_login.lock().await;
+            state.access_token = Some((access_token, Local::now() + Duration::seconds(expires_in as i64)));
             state.refresh_token = refresh_token;
         }
-        MicrosoftTokenResponse::Error {
-            error,
-            error_description,
-            ..
-        } => {
+        MicrosoftTokenResponse::Error { error, error_description, .. } => {
             warn!("Received error {error} from Microsoft: {error_description}");
             return;
         }

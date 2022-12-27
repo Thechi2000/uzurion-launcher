@@ -1,6 +1,6 @@
 use log::debug;
-use reqwest::{Client, header, RequestBuilder};
 use reqwest::header::HeaderValue;
+use reqwest::{header, Client};
 use serde::{Deserialize, Serialize};
 use url::Url;
 
@@ -36,6 +36,8 @@ pub struct MicrosoftTokenForm {
     pub scope: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub code: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub refresh_token: Option<String>,
     pub redirect_uri: String,
     pub grant_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -49,7 +51,11 @@ pub async fn microsoft_token_request(client: &Client, tenant: &str, form: Micros
 
     let content_type = HeaderValue::from_str(&format!("{}", "application/x-www-form-urlencoded")).expect("Header value creation bug");
 
-    client.request(reqwest::Method::POST, format!("https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token").parse::<Url>().unwrap())
+    client
+        .request(
+            reqwest::Method::POST,
+            format!("https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token").parse::<Url>().unwrap(),
+        )
         .header(header::CONTENT_TYPE, content_type)
         .body(serde_urlencoded::to_string(form).unwrap())
         .send()
