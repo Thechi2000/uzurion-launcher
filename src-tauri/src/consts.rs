@@ -14,6 +14,11 @@ pub mod windows {
     pub const MICROSOFT_LOGIN: &str = "microsoft-login";
 }
 
+pub mod microsoft {
+    pub const TENANT: &str = "common";
+    pub const CLIENT_ID: &str = env!("CLIENT_ID");
+}
+
 pub const GAME_UPDATE_URL: &str = "http://127.0.0.1:8000";
 pub const LOCAL_WEBSERVER_URL: &str = "http://127.0.0.1:3000";
 
