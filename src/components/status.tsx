@@ -1,4 +1,4 @@
-import refreshLogo from "./assets/refresh.svg"
+import refreshLogo from "../assets/refresh.svg"
 import { useState, useEffect } from "react";
 import { listen, emit } from '@tauri-apps/api/event'
 import { appWindow, WebviewWindow } from '@tauri-apps/api/window'

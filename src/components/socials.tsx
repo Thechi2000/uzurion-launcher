@@ -1,4 +1,4 @@
-import discordLogo from "./assets/discord.svg"
+import discordLogo from "../assets/discord.svg"
 
 export default function Socials(){
     return (

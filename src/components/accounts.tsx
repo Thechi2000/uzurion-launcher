@@ -1,4 +1,4 @@
-import accountLogo from "./assets/account.svg"
+import accountLogo from "../assets/account.svg"
 
 export default function Accounts({show}) {
     return (

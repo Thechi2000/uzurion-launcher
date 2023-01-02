@@ -1,4 +1,4 @@
-import settingsLogo from "./assets/settings.svg"
+import settingsLogo from "../assets/settings.svg"
 
 export default function SettingsLogo({show}){
     return (
