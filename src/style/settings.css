@@ -1,0 +1,98 @@
+.modal-window-canvas {
+    z-index: 5;
+    background-color: #222222BB;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+ 
+    color: beige;
+}
+
+.modal-window {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #222222EE;
+
+    width: 30%;
+    height: 60%;
+
+    border: #000088 solid;
+}
+
+.settings-parameters {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    width: 86%;
+
+    margin: 7%;
+}
+.settings-parameters * {
+    margin-bottom: 3%;
+    width: 100%;
+}
+.settings-parameters * * {
+    width: auto;
+}
+
+#settings-navigator {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    height: 12%;
+    width: 100%;
+
+
+    border-top: #000044 solid;
+}
+
+#settings-pages-selectors {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: repeat(2, 25%);
+    width: 100%;
+}
+
+#settings-pages-selectors * {
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.selected-settings-pane {
+    cursor: pointer;
+    background-color: #00000044;
+    width: 100%;
+    height: 100%;
+}
+
+#settings-quit {
+    cursor: pointer;
+    margin-right: 7%;
+}
+
+#settings-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#settings-logo-image {
+    filter: invert(100%) sepia(0%) saturate(371%) hue-rotate(146deg) brightness(112%) contrast(73%);
+    cursor: pointer;
+}
+
+.setting-name {
+    margin-right: 10px;
+}

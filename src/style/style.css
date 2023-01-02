@@ -1,0 +1,125 @@
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+
+  background-image: url("../assets/background.jpg");
+  background-size: cover;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+#title {
+  margin-top: 1em;
+  font-size: 6em;
+}
+
+#app {
+  text-align: center;
+}
+
+#app-menu {
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  height: 45%;
+  width: 100%;
+
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vertical-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+#app-menu > .vertical-container {
+  margin: 0;
+  
+  align-self: flex-end;
+  text-align: center;
+
+  height: 90%;
+  width: 10%;
+
+  background-color: #111111AA;
+
+  border-top-right-radius: 20px;
+}
+#app-menu > .vertical-container > * {
+  margin: 5%;
+  height: 100%;
+}
+#app-menu > .vertical-container > * > * {
+  height: auto;
+}
+
+#app-menu > .vertical-container + .center {
+  width: 35%;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+#app-menu > .vertical-container + .right {
+  width:15%;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 0;
+}
+
+#status {
+  color: beige;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+#status h2 {
+  font-size: 24px;
+}
+
+#status > * {
+  margin: 3%;
+}
+
+#status p{
+  font-size: 16px;
+  line-height: 30%;
+}
+
+#socials {
+  display: flex;
+  flex-wrap: nowrap;
+  height: 30%;
+}
+
+#accounts {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#account-logo {
+  filter: invert(100%) sepia(0%) saturate(371%) hue-rotate(146deg) brightness(112%) contrast(73%);
+  cursor: pointer;
+}

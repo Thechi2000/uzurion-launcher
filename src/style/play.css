@@ -1,0 +1,64 @@
+#play {
+    color: beige;
+    width: 70%;
+}
+
+#play-button {
+    background-color: #FF000088;
+
+    min-width: 100%;
+    min-height: 100%;
+
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    font-family: "04b30";
+
+    border-radius: 10px;
+
+    border: 1px solid transparent;
+    transition: border-color 0.25s;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+ 
+    left: -10px;
+}
+
+#play-button:hover {
+    border-color: darkblue;
+}
+
+@font-face {
+    font-family: "04b30";
+    src: url('./assets/fonts/04b30-webfont.woff2') format('woff2'),
+        url('./assets/fonts/04b30-webfont.woff') format('woff');
+}
+
+#update {
+    display: contents;
+}
+#update-stage-description {
+    border-radius: 10px;
+    text-align: center;
+    background-color: #333333;
+
+    height: 100%;
+
+    font-size: 20px;
+
+    justify-content: center;
+}
+#update-stage-description > * {
+    margin: 5px 0;
+}
+
+#update-stage-progress-bar {
+    background-color: black;
+    height: 5px;
+    width: 70%;
+}
+
+#update-stage-progress-bar > * {
+    background-color: lime;
+    height: inherit;
+    width: 0;
+}
