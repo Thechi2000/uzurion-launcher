@@ -20,6 +20,7 @@ mod settings;
 mod consts;
 mod update;
 mod routing;
+mod event;
 
 #[tauri::command]
 fn play() {
