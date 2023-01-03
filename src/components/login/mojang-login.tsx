@@ -1,7 +1,7 @@
 import { invoke } from "@tauri-apps/api/tauri"
 import { useState } from "react"
 
-export default function MojangLogin({hide}){
+export default function MojangLogin(props: {hide: CallableFunction}){
     const [email, setEmail] = useState("")
     const [pwd, setPwd] = useState("")
     const [remember, setRemember] = useState(false)
@@ -27,7 +27,7 @@ export default function MojangLogin({hide}){
                 <span onClick={() => setRemember(!remember)}>Remember me</span>
             </div>
             <button onClick={() => login()}>Login</button>
-            <button onClick={hide}>Cancel</button>
+            <button onClick={() => props.hide()}>Cancel</button>
         </div>
     )
 }

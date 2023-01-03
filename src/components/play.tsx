@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { debug, info, warn } from "tauri-plugin-log-api";
 
 export default function Play(){
-    const [updateStage, setUpdateStage] = useState(undefined)
-    const [download, setDownload] = useState(undefined)
+    const [updateStage, setUpdateStage] = useState(null as string | null)
+    const [download, setDownload] = useState(null as string | null)
     const [doneDownload, setDoneDownload] = useState(0)
     const [totalDownload, setTotalDownload] = useState(1)
 
@@ -22,7 +22,7 @@ export default function Play(){
             case 'downloading':
                 return <span>Downloading<br/>{download}</span>
             default:
-                undefined
+                null
         }
     }
 
@@ -30,10 +30,10 @@ export default function Play(){
         info('Registering game-update listener')
         let unlistener = listen(
             'game-update', 
-            e => {
+            (e: {payload: {type: string, name: string, done: number, total: number}}) => {
                 debug('Received event game-update with payload ' + JSON.stringify(e.payload))
 
-                switch (e.payload['type']) {
+                switch (e.payload.type) {
                     case 'start':
                         setUpdateStage('fetching')
                         break
@@ -47,20 +47,17 @@ export default function Play(){
                         break
 
                     case 'update_state':
-                        setDownload(e.payload['name'])
-                        setDoneDownload(e.payload['done'])
-                        setTotalDownload(e.payload['total'])
+                        setDownload(e.payload.name)
+                        setDoneDownload(e.payload.done)
+                        setTotalDownload(e.payload.total)
                         break
 
                     case 'download_done':
-                        setUpdateStage(undefined)
-                        setDownload(undefined)
+                    case 'failure':
+                        setUpdateStage(null)
+                        setDownload(null)
                         setDoneDownload(0)
                         setTotalDownload(1)
-                        break
-
-                    case 'failure':
-                        setUpdateStage('failure')
                         break
                 
                     default:
@@ -79,8 +76,8 @@ export default function Play(){
 
     return (
         <div id="play">
-            <button id="play-button" style={{ display:updateStage === undefined ? 'inherit': 'none' }} onClick={() => play()}>Play</button>
-            <div id="update" style={{ display:updateStage === undefined ? 'none': 'contents' }}>
+            <button id="play-button" style={{ display:updateStage === null ? 'inherit': 'none' }} onClick={() => play()}>Play</button>
+            <div id="update" style={{ display:updateStage === null ? 'none': 'contents' }}>
                 <div id="update-stage-description" className="vertical-container">
                     <div>{stageDescription()}</div>
                     <div id="update-stage-progress-bar" style={{display:updateStage === 'downloading' ? 'inherit': 'none'}}><div style={{width: `${doneDownload/totalDownload * 100}%`}}></div></div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import SettingsLogo from "./settings-logo";
 import Accounts from "./accounts";
 import Socials from "./socials";
@@ -6,12 +6,23 @@ import Status from "./status";
 import Settings from "./settings";
 import Login from "./login/login";
 import Play from "./play";
+import Error from "./error"
+import { listen } from "@tauri-apps/api/event";
+import { debug } from "tauri-plugin-log-api";
 
 export default function App() {
-  const [modalWindow, setModalWindow] = useState(undefined)
+  const [modalWindow, setModalWindow] = useState(null as ReactElement | null)
 
-  const settingsModalWindow = <Settings hide={() => setModalWindow(undefined)}/>
-  const loginModalWindow = <Login hide={() => setModalWindow(undefined)}/>
+  const settingsModalWindow = <Settings hide={() => setModalWindow(null)}/>
+  const loginModalWindow = <Login hide={() => setModalWindow(null)}/>
+
+  useEffect(() =>{
+    let u = listen('error', (e: {payload: {name: string; description: string}}) => {
+      debug("Received error with payload: " + JSON.stringify(e.payload))
+      return setModalWindow(<Error name={e.payload.name} description={e.payload.description} hide={() => setModalWindow(null)} />);
+    })
+    return () => {u.then(u => u())}
+  })
 
   return (
     <div>

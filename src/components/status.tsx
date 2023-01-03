@@ -4,12 +4,19 @@ import { listen, emit } from '@tauri-apps/api/event'
 import { appWindow, WebviewWindow } from '@tauri-apps/api/window'
 import { debug, trace } from 'tauri-plugin-log-api'
 
+interface status{
+    online: boolean,
+    players: {
+        online: number,
+        max: number,
+    }
+}
 
 export default function Status() {
-    const [status, setStatus] = useState(undefined)
+    const [status, setStatus] = useState(null as status | null)
     
     useEffect(() => {
-        let unlistener = listen("server-status", (e) => {
+        let unlistener = listen("server-status", (e: {payload: status}) => {
             debug("Received server-status event with payload " + JSON.stringify(e.payload))
             setStatus(e.payload)
         })
@@ -21,7 +28,7 @@ export default function Status() {
     }, []);
     
     function isOnline(){
-        return !(status == undefined || !status["online"])
+        return !(status == null || !status.online)
     }
 
     function statusText(){
@@ -42,9 +49,9 @@ export default function Status() {
 
     function getOnlinePlayers(){
         if (isOnline()){
-            return status["players"]["online"]
+            return status?.players.online
         } else {
-            return undefined
+            return null
         }
     }
 

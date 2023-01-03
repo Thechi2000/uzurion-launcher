@@ -4,34 +4,42 @@ import { useEffect, useState } from "react"
 import { debug, error, trace } from "tauri-plugin-log-api"
 import { useEffectOnce } from "usehooks-ts"
 
-export default function Settings({hide}){
+interface settings {
+    game: {
+        resolution: [number, number];
+        ram: number
+    };
+    launcher: {}
+}
+
+export default function Settings(props: {hide: CallableFunction}){
     const [selectedPane, setSelectedPane] = useState("game")
-    const [settings, setSettings] = useState({})
+    const [settings, setSettings] = useState({
+        game: {
+            resolution: [1920, 1080],
+            ram: 1024
+        },
+        launcher: {}
+    } as settings)
     const [settingsLoaded, setSetingsLoaded] = useState(false)
 
     const [ram, setRam] = useState(1024)
     const [resolution, setResolution] = useState([1920, 1080])
 
-    async function updateSetting(type, idx, value) {
-        debug(`Updating ${type} ${idx} to ${value}`)
-
-        var set = Object.assign({}, settings)
-        set[type][idx] = value
-
+    async function updateSetting(updater: (set: settings) => void) {
+        var set = Object.assign({}, settings);
+        updater(set);
         await invoke("set_settings", {settings: set}).catch(e => error(e))
     }
 
     useEffect(() => {
         if(settingsLoaded) {
-            setResolution(settings['game']['resolution'])
-            setRam(settings['game']['ram'])
-            debug("####" + resolution.join('x'))
-            debug("####" + ram)
-            debug("#####" + document.getElementById('resolution-input').getAttribute('value'))
+            setResolution(settings.game.resolution)
+            setRam(settings.game.ram)
         }
     }, [settings, settingsLoaded])
 
-    function genResolutionOptions(values){
+    function genResolutionOptions(values: [number, number][]){
         return values.map(r => {
             let str = `${r[0]}x${r[1]}`
             return <option value={str}>{str}</option>
@@ -42,7 +50,7 @@ export default function Settings({hide}){
     useEffect(() => {
         trace("Registering settings listener")
 
-        let unlistener = listen('settings-update', e => {
+        let unlistener = listen('settings-update', (e: {payload: settings}) => {
             debug(`Updating settings to ${JSON.stringify(e.payload)}`)
             setSettings(e.payload)
         })
@@ -65,13 +73,13 @@ export default function Settings({hide}){
                     <div className="settings-parameters">
                         <div>
                             <span className="setting-name">RAM: </span>
-                            <input value={ram} type="range" onChange={e => updateSetting('game', 'ram', parseInt(e.target.value))} min={1024} max={16384}/>
-                            <input value={ram} type="number" onChange={e => updateSetting('game', 'ram', parseInt(e.target.value))} min={1024} max={16384}/>
+                            <input value={ram} type="range" onChange={e => updateSetting(set => {set.game.ram=parseInt(e.target.value)})} min={1024} max={16384}/>
+                            <input value={ram} type="number" onChange={e => updateSetting(set => {set.game.ram=parseInt(e.target.value)})} min={1024} max={16384}/>
                         </div>
         
                         <div>
                             <span className="setting-name">Resolution:</span>
-                            <select id="resolution-input" value={resolution.map(p=>p.toString()).join('x')} onChange={e => updateSetting('game', 'resolution', e.target.value.split('x').map(i => parseInt(i)))}>
+                            <select id="resolution-input" value={resolution.map(p=>p.toString()).join('x')} onChange={e => updateSetting(set => set.game.resolution=e.target.value.split('x').map(i => parseInt(i)) as [number, number])}>
                                 {genResolutionOptions([
                                     [1920, 1080],
                                     [2560, 1440],
@@ -90,7 +98,7 @@ export default function Settings({hide}){
         
     }
 
-    function selectedClass(name) {
+    function selectedClass(name: string) {
         return selectedPane == name ? "selected-settings-pane" : ""
     }
 
@@ -103,7 +111,7 @@ export default function Settings({hide}){
                         <div className={selectedClass("game")} onClick={() => setSelectedPane("game")}><p>Game</p></div>
                         <div className={selectedClass("launcher")} onClick={() => setSelectedPane("Launcher")}><p>Launcher</p></div>
                     </div>
-                    <div id="settings-quit"><p onClick={hide}>Quit</p></div>
+                    <div id="settings-quit"><p onClick={() => props.hide()}>Quit</p></div>
                 </div>
             </div>
         </div>
