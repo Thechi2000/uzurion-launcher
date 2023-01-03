@@ -1,7 +1,6 @@
 #![allow(unused)]
 
 ///! Imported from https://www.github.com/Thechi2000/bootstrap
-
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
@@ -16,7 +15,7 @@ use tokio::sync::mpsc;
 
 pub use error::Error;
 use crate::consts::*;
-use crate::send_event;
+use crate::{send_error, send_event};
 use crate::update::updater::update;
 
 pub mod error;
@@ -151,6 +150,17 @@ pub async fn check_update(app: AppHandle<Wry>) {
             }
             updater::Message::Interrupted(e) => {
                 error!("Could not update game: {:?}", e);
+                let desc = match *e {
+                    Error::IO(e) => e.to_string(),
+                    Error::Path(e) => e.to_string(),
+                    Error::Url(e) => e.to_string(),
+                    Error::Utf8(e) => e.to_string(),
+                    Error::Json(e) => e.to_string(),
+                    Error::Reqwest(e) => e.to_string(),
+                    Error::MpscSend(e) => e.to_string(),
+                    Error::Other(s) => s,
+                };
+                send_error!(app, "Unable to update".to_owned(), desc);
                 Message::Failure
             }
         };
