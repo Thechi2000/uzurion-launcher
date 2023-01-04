@@ -150,17 +150,7 @@ pub async fn check_update(app: AppHandle<Wry>) {
             }
             updater::Message::Interrupted(e) => {
                 error!("Could not update game: {:?}", e);
-                let desc = match *e {
-                    Error::IO(e) => e.to_string(),
-                    Error::Path(e) => e.to_string(),
-                    Error::Url(e) => e.to_string(),
-                    Error::Utf8(e) => e.to_string(),
-                    Error::Json(e) => e.to_string(),
-                    Error::Reqwest(e) => e.to_string(),
-                    Error::MpscSend(e) => e.to_string(),
-                    Error::Other(s) => s,
-                };
-                send_error!(app, "Unable to update".to_owned(), desc);
+                send_error!(app, "Unable to update".to_owned(), e.to_string());
                 Message::Failure
             }
         };

@@ -13,6 +13,21 @@ pub enum Error{
     Other(String),
 }
 
+impl ToString for Error{
+    fn to_string(&self) -> String {
+        match self{
+            Error::IO(e) => e.to_string(),
+            Error::Path(e) => e.to_string(),
+            Error::Url(e) => e.to_string(),
+            Error::Utf8(e) => e.to_string(),
+            Error::Json(e) => e.to_string(),
+            Error::Reqwest(e) => e.to_string(),
+            Error::MpscSend(e) => e.to_string(),
+            Error::Other(s) => s.to_owned(),
+        }
+    }
+}
+
 impl From<String> for Error{
     fn from(err: String)-> Self{
         Error::Other(err)
