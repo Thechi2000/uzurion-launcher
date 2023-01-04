@@ -8,17 +8,18 @@ use crate::consts::*;
 use crate::login::receive_auth_code;
 
 use crate::routing::parse_query;
+use crate::send_error;
 
 pub async fn microsoft_auth(
     req: Request<hyper::body::Incoming>,
-    handle: AppHandle<Wry>,
+    app: AppHandle<Wry>,
 ) -> Result<Response<String>, Infallible> {
     let Some(Some(query)) = req.uri().path_and_query().map(PathAndQuery::query) else {
         warn!("No query parameters");
         return Ok(Response::new("".to_owned()))
     };
 
-    handle.get_window(windows::MICROSOFT_LOGIN).map(|w| {
+    app.get_window(windows::MICROSOFT_LOGIN).map(|w| {
         if let Err(e) = w.close() {
             error!("Could not close microsoft-login window: {:?}", e);
         }
@@ -28,7 +29,10 @@ pub async fn microsoft_auth(
     debug!("{:?}", query);
 
     if let Some(Some(code)) = query.get("code") {
-        tokio::spawn(receive_auth_code(code.to_owned(), handle));
+        tokio::spawn(receive_auth_code(code.to_owned(), app));
+    } else {
+        error!("Missing code in Microsoft request: {:?}", query);
+        send_error!(app, "Microsoft login failed", "Missing code in Microsoft request");
     }
 
     Ok(Response::new("".to_owned()))

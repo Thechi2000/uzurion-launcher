@@ -1,8 +1,9 @@
 use std::time::Duration;
-use log::{debug, info, warn};
+use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
-use tauri::{App, AppHandle, Manager, Wry};
+use tauri::{App, AppHandle, Wry};
 use crate::consts::*;
+use crate::send_event;
 
 #[derive(Serialize, Deserialize, Clone, Copy)]
 pub struct ServerStatus {
@@ -18,13 +19,12 @@ pub struct PlayersStatus {
     pub online: u32,
 }
 
-async fn fetch_server_status(ip: &str) -> Result<ServerStatus, String> {
+async fn fetch_server_status(ip: &str) -> Result<ServerStatus, reqwest::Error> {
     // Using https://api.mcsrvstat.us/ api to get server status
-    reqwest::get(format!("https://api.mcsrvstat.us/2/{ip}")).await
-        .map_err(|e| format!("Could not send request to https://api.mcsrvstat.us/2/: {:?}", e))?.json::<ServerStatus>().await.map_err(|e| format!("Could not parse response: {:?}", e))
+    reqwest::get(format!("https://api.mcsrvstat.us/2/{ip}")).await?.json::<ServerStatus>().await
 }
 
-pub async fn refresh_server_status(ip: &str, tx: AppHandle<Wry>) {
+pub async fn refresh_server_status(ip: &str, app: AppHandle<Wry>) {
 // Fetch state and get lock from the state
     let state = fetch_server_status(ip).await;
 
@@ -32,16 +32,11 @@ pub async fn refresh_server_status(ip: &str, tx: AppHandle<Wry>) {
     match state {
         Ok(status) => {
             debug!("Received state {:?}", serde_json::to_string(&status));
-
-            if let Err(e) = tx.emit_all(events::SERVER_STATUS_REFRESH, Some(status)) {
-                warn!("Could not send ServerStatus: {:?}", e);
-            }
+            send_event!(app, events::SERVER_STATUS_REFRESH, Some(status));
         }
         Err(e) => {
-            warn!("Could not fetch server status: {:?}", e);
-            if let Err(e) = tx.emit_all(events::SERVER_STATUS_REFRESH, Option::<ServerStatus>::None) {
-                warn!("Could not send ServerStatus: {:?}", e);
-            }
+            error!("Could not fetch server status: {:?}", e);
+            send_event!(app, events::SERVER_STATUS_REFRESH, Option::<ServerStatus>::None);
         }
     }
 }

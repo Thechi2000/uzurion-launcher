@@ -2,7 +2,7 @@ use log::{debug, error, warn};
 use serde::{Deserialize, Serialize};
 use tauri::{State, Wry, AppHandle, Manager};
 use tokio::fs::read_to_string;
-use crate::AppState;
+use crate::{AppState, send_error, send_event};
 use crate::consts::*;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -53,24 +53,24 @@ pub struct GameSettings {
 pub struct LauncherSettings {}
 
 #[tauri::command]
-pub async fn set_settings(settings: Settings, state: State<'_, AppState>, handle: AppHandle<Wry>) -> Result<(), ()> {
+pub async fn set_settings(settings: Settings, state: State<'_, AppState>, app: AppHandle<Wry>) -> Result<(), ()> {
     *state.settings.lock().unwrap() = settings.clone();
     debug!("Updating settings to {:?}", settings);
 
     let settings_json = match serde_json::to_string(&settings) {
         Ok(s) => s,
         Err(e) => {
-            warn!("Could not convert settings {:?} to json: {:?}", settings, e);
+            error!("Could not convert settings {:?} to json: {:?}", settings, e);
+            send_error!(app, "Invalid settings file", e);
             return Err(());
         }
     };
 
-    if let Err(e) = handle.emit_all(events::SETTINGS_UPDATE, settings) {
-        warn!("Could not send event {}: {:?}", events::SETTINGS_UPDATE, e);
-    }
+    send_event!(app, events::SETTINGS_UPDATE, settings);
 
     if let Err(e) = tokio::fs::write(files::SETTINGS, settings_json).await {
-        warn!("Could not write settings to {}: {:?}", files::SETTINGS, e);
+        error!("Could not write settings to {}: {:?}", files::SETTINGS, e);
+        send_error!(app, "Cannot save settings", e);
         Err(())
     } else {
         Ok(())
@@ -78,8 +78,8 @@ pub async fn set_settings(settings: Settings, state: State<'_, AppState>, handle
 }
 
 #[tauri::command]
-pub async fn get_settings(state: State<'_, AppState>, handle: AppHandle<Wry>) -> Result<(), ()> {
-    if let Err(e) = handle.emit_all(events::SETTINGS_UPDATE, state.settings.lock().unwrap().clone()) {
+pub async fn get_settings(state: State<'_, AppState>, app: AppHandle<Wry>) -> Result<(), ()> {
+    if let Err(e) = app.emit_all(events::SETTINGS_UPDATE, state.settings.lock().unwrap().clone()) {
         error!("Could not send {} event: {:?}", events::SETTINGS_UPDATE, e);
         Err(())
     } else {

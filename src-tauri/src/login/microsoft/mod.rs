@@ -1,6 +1,6 @@
 use crate::consts::{microsoft, LOCAL_WEBSERVER_URL};
 use crate::login::microsoft::requests::{microsoft_token_request, MicrosoftTokenForm, MicrosoftTokenResponse};
-use crate::AppState;
+use crate::{AppState, send_error};
 use chrono::{DateTime, Duration, Local};
 use log::{debug, error, trace, warn};
 use oauth2::{PkceCodeChallenge, PkceCodeVerifier};
@@ -52,7 +52,7 @@ impl MicrosoftLoginData {
                         client_secret: None,
                     },
                 )
-                .await
+                    .await
                 {
                     Ok(MicrosoftTokenResponse::Success { access_token, expires_in, .. }) => {
                         trace!("Microsoft access token refreshed");
@@ -97,6 +97,7 @@ pub async fn microsoft_login(app: AppHandle<Wry>) {
         Ok(u) => u,
         Err(e) => {
             error!("Could not generate microsoft login url: {:?}", e);
+            send_error!(app, "Microsoft login failed", e);
             return;
         }
     };
@@ -114,13 +115,14 @@ pub async fn microsoft_login(app: AppHandle<Wry>) {
         Ok(w) => w,
         Err(e) => {
             error!("Could not open window for microsoft login: {:?}", e);
+            send_error!(app, "Cannot create window", e);
             return;
         }
     };
 }
 
-pub async fn receive_auth_code(code: String, handle: AppHandle<Wry>) {
-    let state = handle.state::<AppState>();
+pub async fn receive_auth_code(code: String, app: AppHandle<Wry>) {
+    let state = app.state::<AppState>();
     let verifier = {
         let lock = state.microsoft_login.lock().unwrap();
         if let Some(verifier) = &lock.verifier {
@@ -147,11 +149,12 @@ pub async fn receive_auth_code(code: String, handle: AppHandle<Wry>) {
             client_secret: None,
         },
     )
-    .await
+        .await
     {
         Ok(r) => r,
         Err(e) => {
             error!("Request for access_token failed: {:?}", e);
+            send_error!(app, "Microsoft login failed", e);
             return;
         }
     };
@@ -164,13 +167,14 @@ pub async fn receive_auth_code(code: String, handle: AppHandle<Wry>) {
             refresh_token,
             ..
         } => {
-            let state = handle.state::<AppState>();
+            let state = app.state::<AppState>();
             let mut state = state.microsoft_login.lock().unwrap();
             state.access_token = Some((access_token, Local::now() + Duration::seconds(expires_in as i64)));
             state.refresh_token = refresh_token;
         }
         MicrosoftTokenResponse::Error { error, error_description, .. } => {
             warn!("Received error {error} from Microsoft: {error_description}");
+            send_error!(app, "Microsoft login failed", format!("{}: {}", error, error_description));
             return;
         }
     }

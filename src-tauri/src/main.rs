@@ -21,11 +21,7 @@ mod consts;
 mod update;
 mod routing;
 mod event;
-
-#[tauri::command]
-fn play() {
-    println!("Have fun :)")
-}
+mod play;
 
 pub struct AppState {
     pub settings: Arc<Mutex<Settings>>,
@@ -96,7 +92,7 @@ async fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            play,
+            play::play,
             login::mojang_login,
             login::microsoft_login,
             settings::set_settings,

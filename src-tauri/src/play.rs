@@ -1,5 +1,5 @@
 use crate::login::requests::{request_xbox_live_token, XBoxLiveAuthenticationResponse};
-use crate::AppState;
+use crate::{AppState, send_error};
 use log::{debug, error, trace, warn};
 use tauri::{AppHandle, Manager, Wry};
 
@@ -11,6 +11,7 @@ pub async fn play(app: AppHandle<Wry>) {
     trace!("Requesting XBoxLive authentication token");
     let Some(access_token) = futures::executor::block_on(state.microsoft_login.lock().unwrap().access_token_or_refresh(&state.client)) else {
         warn!("Could not refresh access token");
+        send_error!(app, "Login needed", "You need to login before playing");
         return;
     };
 
@@ -19,12 +20,14 @@ pub async fn play(app: AppHandle<Wry>) {
         Ok(XBoxLiveAuthenticationResponse { token, display_claims, .. }) => {
             let Some(user_hash) = display_claims.xui.first() else {
                 error!("Missing user hash in XBoxLive response");
+                send_error!(app, "XBox login failed", "Missing user hash in XBoxLive response");
                 return;
             };
             (token, user_hash.uhs.clone())
         }
         Err(e) => {
             error!("Could not request XBoxLive authentication token: {:?}", e);
+            send_error!(app, "XBox login failed", e);
             return;
         }
     };

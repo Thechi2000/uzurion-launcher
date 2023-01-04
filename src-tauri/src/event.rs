@@ -24,12 +24,12 @@ macro_rules! send_event {
 #[macro_export]
 macro_rules! send_error {
     ($app: expr, $name: expr, $description: expr) => {
-        send_event!{
+        crate::send_event!{
             $app,
             crate::consts::events::ERROR,
             crate::event::ErrorEventPayload{
-                name: $name,
-                description: $description,
+                name: $name.to_string(),
+                description: $description.to_string(),
             }
         }
     };
