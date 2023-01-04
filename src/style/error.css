@@ -1,5 +1,5 @@
 #error-modal-window{
-    height: 20%;
+    height: 30%;
     padding: 1% 2% 1% 2%;
 }
 #error-modal-window > div{
@@ -10,6 +10,11 @@
 #error-modal-window h2, p{
     -webkit-user-select: text;
     user-select: text;
+}
+
+#error-modal-window > div > div {
+    overflow: scroll;
+    height: 60%;
 }
 
 #error-modal-window button {
